@@ -4,6 +4,7 @@ EOF = False
 
 class Lexer():
     
+    error=False
     
     regex_dict={
     'arreglo':r'\barreglo\b(?![\w_])',
@@ -41,8 +42,51 @@ class Lexer():
     'y':r'\by\b(?![\w_])',
     }
     
+    def match_symbol(self,code,line,end_index,position):
+        
+        char_match = r'\'(.*?)\''
+        
+        if re.match(char_match, code, re.IGNORECASE) != None:
+            self.report_token('tkn_char',re.match(char_match, code).group(),line,position+1,False)
+            end_index = re.match(char_match, code).end()
+            position+=end_index
+        else:
+            self.report_error(line,position+1)
+        
+        return end_index
+    
+    def match_string(self,code,line,end_index,position):
+        
+        string_match = r'\"(.*?)\"'
+        
+        if re.match(string_match, code, re.IGNORECASE) != None:
+            self.report_token('tkn_str',re.match(string_match, code).group().replace('\"',''),line,position+1,False)
+            end_index = re.match(string_match, code).end()
+            position+=end_index
+        
+        else:
+            self.report_error(line,position+1)
+        
+        return end_index
+    
+    def match_char(self,code,line,end_index,position):
+        
+        char_match = r'\'(.?)\''
+        
+        if re.match(char_match, code, re.IGNORECASE) != None:
+            self.report_token('tkn_char',re.match(char_match, code).group().replace('\'',''),line,position+1,False)
+            end_index = re.match(char_match, code).end()
+            position+=end_index
+        else:
+            self.report_error(line,position+1)
+        
+        return end_index
+        
+    
     
     def match_id(self,code,line,end_index,position):
+        
+        # Match the id
         
         id_match = r'[a-zA-Z_][\w_]*'
         
@@ -56,6 +100,7 @@ class Lexer():
     
     def match_keywords(self,code,line,end_index,position):
         
+        # Match the key words 
         found=False
             
         for key in self.regex_dict:
@@ -68,6 +113,7 @@ class Lexer():
                 found=True
                 break
         
+        # Match the ids that start with any letter and those who were not recognized as key words
         if(found==False):
             end_index=self.match_id(code,line,end_index,position)
         
@@ -82,6 +128,7 @@ class Lexer():
         end_of_line=False
         
         while(line_size>0):
+
             i=0
             
             while(code[i]==' '):
@@ -96,18 +143,32 @@ class Lexer():
                 break
             
             
+            #print("Code by this iteration: ",code)
             
-            #print("First char: ",code[0])
-            
+            # Match the keywords 
             if(re.match(r'[a-zA-Z]',code[0],re.IGNORECASE)!=None):
                 end_index = self.match_keywords(code,line,end_index,position) #could be commented
             
+            # Match the ids that start with _ 
             elif(code[0]=='_'):
                 end_index = self.match_id(code,line,end_index,position) #could be commented
             
+            elif(code[0]=='\''):
+                end_index= self.match_char(code,line,end_index,position)
+            
+            elif(code[0]=='\"'):
+                end_index = self.match_string(code,line,end_index,position)
+            
+            else:
+                end_index = self.match_symbol(code,line,end_index,position)
+            
             position+=end_index
             
+            if(self.error==True):
+                break
+            
             code = code[end_index:]
+            #print("Code by this iteration: ",code)
             line_size=len(code)
             
     def report_token(self,token,lexem,line,position,key_word):
@@ -117,7 +178,10 @@ class Lexer():
         else:
             print("<{},{},{},{}>".format(token,lexem,line,position))
     
-    
+    def report_error(self,line,position):
+        self.error=True
+        print(">>> Error lexico (linea: {}, posicion: {})".format(line,position))
+        
 
 
 
@@ -127,6 +191,9 @@ try:
     while True:
         current_line = input()
         Lpp_lexer.analize(current_line,line)
+        
+        if(Lpp_lexer.error==True):
+            break
         line+=1
         
 except EOFError:
