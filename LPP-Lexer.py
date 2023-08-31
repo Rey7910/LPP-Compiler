@@ -47,7 +47,7 @@ class Lexer():
         id_match = r'[a-zA-Z_][\w_]*'
         
         if re.match(id_match, code, re.IGNORECASE) != None:
-            self.report_token('id',re.match(id_match, code, re.IGNORECASE).group(),line,position+1,False)
+            self.report_token('id',re.match(id_match, code, re.IGNORECASE).group().lower(),line,position+1,False)
             end_index = re.match(id_match, code, re.IGNORECASE).end()
             position+=end_index
         
