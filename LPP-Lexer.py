@@ -14,6 +14,8 @@ class Lexer():
     
     error=False
     block_comment=False
+    block_comment_line=0
+    block_comment_position=0
     
     regex_dict={
     'arreglo':r'\barreglo\b(?![\w_])',
@@ -72,7 +74,6 @@ class Lexer():
         'geq':r'>=',
         'greater':r'>',
         'less':r'<',
-        
     }
     
     def match_symbol(self,code,line,end_index,position):
@@ -109,6 +110,23 @@ class Lexer():
         
         else:
             self.report_error(line,position+1)
+        
+        return end_index
+        
+    def match_number(self,code,line,end_index,position):
+        
+        real_match = r'[0-9]+\.[0-9]+'
+        integer_match = r'[0-9]+'
+        
+        if re.match(real_match, code) != None:
+            self.report_token('tkn_real',re.match(real_match, code).group(),line,position+1,False)
+            end_index = re.match(real_match, code).end()
+            position+=end_index
+        
+        elif re.match(integer_match, code) != None:
+            self.report_token('tkn_integer',re.match(integer_match, code).group(),line,position+1,False)
+            end_index = re.match(integer_match, code).end()
+            position+=end_index
         
         return end_index
     
@@ -192,13 +210,19 @@ class Lexer():
                 if(code[1]=='/'):
                     break
                 elif(code[1]=='*'):
+                    # Match block comment
                     self.block_comment=True
+                    self.block_comment_line=line
+                    self.block_comment_position=position
                     code = code[2:]
                     position+=2
                     
             if(len(code)>=2 and code[0]=='*'):
+                # Close block comment
                 if(code[1]=='/'):
                     self.block_comment=False
+                    self.block_comment_line=0
+                    self.block_comment_position=0
                     code = code[2:]
                     position+=2
                     i=0
@@ -231,6 +255,9 @@ class Lexer():
                 
                 elif(code[0]=='\"'):
                     end_index = self.match_string(code,line,end_index,position)
+                    
+                elif(re.match(r'[0-9]',code[0])!=None):
+                    end_index= self.match_number(code,line,end_index,position)
                 
                 else:
                     end_index = self.match_symbol(code,line,end_index,position)
@@ -278,4 +305,7 @@ try:
         
 except EOFError:
     EOF=True
+    
+    if(EOF==True and Lpp_lexer.block_comment==True):
+        Lpp_lexer.report_error(Lpp_lexer.block_comment_line,Lpp_lexer.block_comment_position+1)
 
