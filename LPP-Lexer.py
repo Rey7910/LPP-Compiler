@@ -1,3 +1,11 @@
+'''
+Lexer - Lenguaje de Programación LPP
+Reinaldo Toledo Leguizamón
+Monitoría de Lenguajes de programación
+2023-2
+
+'''
+
 import re
 
 EOF = False
@@ -157,12 +165,14 @@ class Lexer():
 
     def analize(self,code,line):
         end_index=0
+        single_line_comment=False
         line_size=len(code)
         position=0
         end_of_line=False
         
         while(line_size>0):
-
+            
+            
             i=0
             
             while(code[i]==' '):
@@ -175,6 +185,12 @@ class Lexer():
             
             if(len(code)==0):
                 break
+            
+            # Matching comments of single line denoted by //
+            if(len(code)>=2 and code[0]=='/'):
+                if(code[1]=='/'):
+                    break
+            
             
             
             #print("Code by this iteration: ",code)
@@ -216,8 +232,6 @@ class Lexer():
         self.error=True
         print(">>> Error lexico (linea: {}, posicion: {})".format(line,position))
         
-
-
 
 try:
     line=1
