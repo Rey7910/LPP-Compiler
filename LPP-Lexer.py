@@ -41,7 +41,22 @@ class Lexer():
     'y':r'\by\b(?![\w_])',
     }
     
+    
+    def match_id(self,code,line,end_index,position):
+        
+        id_match = r'[a-zA-Z_][\w_]*'
+        
+        if re.match(id_match, code, re.IGNORECASE) != None:
+            self.report_token('id',re.match(id_match, code, re.IGNORECASE).group(),line,position+1,False)
+            end_index = re.match(id_match, code, re.IGNORECASE).end()
+            position+=end_index
+        
+        return end_index
+
+    
     def match_keywords(self,code,line,end_index,position):
+        
+        found=False
             
         for key in self.regex_dict:
             
@@ -50,7 +65,11 @@ class Lexer():
                 self.report_token(key,key,line,position+1,True)
                 end_index = re.match(self.regex_dict[key], code, re.IGNORECASE).end()
                 position+=end_index
+                found=True
                 break
+        
+        if(found==False):
+            end_index=self.match_id(code,line,end_index,position)
         
         return end_index
             
@@ -73,7 +92,19 @@ class Lexer():
             
             code = code[i:]
             
-            end_index = self.match_keywords(code,line,end_index,position) #could be commented
+            if(len(code)==0):
+                break
+            
+            
+            
+            #print("First char: ",code[0])
+            
+            if(re.match(r'[a-zA-Z]',code[0],re.IGNORECASE)!=None):
+                end_index = self.match_keywords(code,line,end_index,position) #could be commented
+            
+            elif(code[0]=='_'):
+                end_index = self.match_id(code,line,end_index,position) #could be commented
+            
             position+=end_index
             
             code = code[end_index:]
@@ -87,7 +118,7 @@ class Lexer():
             print("<{},{},{},{}>".format(token,lexem,line,position))
     
     
-        
+
 
 
 try:
