@@ -13,6 +13,7 @@ EOF = False
 class Lexer():
     
     error=False
+    block_comment=False
     
     regex_dict={
     'arreglo':r'\barreglo\b(?![\w_])',
@@ -172,10 +173,10 @@ class Lexer():
         
         while(line_size>0):
             
-            
             i=0
-            
+        
             while(code[i]==' '):
+                
                 i+=1;
                 position+=1;
                 if(i==len(code)):
@@ -190,36 +191,67 @@ class Lexer():
             if(len(code)>=2 and code[0]=='/'):
                 if(code[1]=='/'):
                     break
+                elif(code[1]=='*'):
+                    self.block_comment=True
+                    code = code[2:]
+                    position+=2
+                    
+            if(len(code)>=2 and code[0]=='*'):
+                if(code[1]=='/'):
+                    self.block_comment=False
+                    code = code[2:]
+                    position+=2
+                    i=0
+                    
+                    if(len(code)>0):
+                    #Recover the next char different to a blank space
+                        while(code[i]==' '):
+                            i+=1;
+                            position+=1;
+                            if(i==len(code)):
+                                break
+                        code = code[i:]
             
-            
+            if(len(code)==0):
+                break
+                    
             
             #print("Code by this iteration: ",code)
-            
-            # Match the keywords 
-            if(re.match(r'[a-zA-Z]',code[0],re.IGNORECASE)!=None):
-                end_index = self.match_keywords(code,line,end_index,position) #could be commented
-            
-            # Match the ids that start with _ 
-            elif(code[0]=='_'):
-                end_index = self.match_id(code,line,end_index,position) #could be commented
-            
-            elif(code[0]=='\''):
-                end_index= self.match_char(code,line,end_index,position)
-            
-            elif(code[0]=='\"'):
-                end_index = self.match_string(code,line,end_index,position)
+            if(self.block_comment==False):
+                # Match the keywords 
+                if(re.match(r'[a-zA-Z]',code[0],re.IGNORECASE)!=None):
+                    end_index = self.match_keywords(code,line,end_index,position) #could be commented
+                
+                # Match the ids that start with _ 
+                elif(code[0]=='_'):
+                    end_index = self.match_id(code,line,end_index,position) #could be commented
+                
+                elif(code[0]=='\''):
+                    end_index= self.match_char(code,line,end_index,position)
+                
+                elif(code[0]=='\"'):
+                    end_index = self.match_string(code,line,end_index,position)
+                
+                else:
+                    end_index = self.match_symbol(code,line,end_index,position)
+                
+                position+=end_index
             
             else:
-                end_index = self.match_symbol(code,line,end_index,position)
-            
-            position+=end_index
+                end_index=1
+                position+=1
             
             if(self.error==True):
                 break
             
             code = code[end_index:]
+            
             #print("Code by this iteration: ",code)
+            
             line_size=len(code)
+            
+            if(len(code)==0):
+                break
             
     def report_token(self,token,lexem,line,position,key_word):
         
