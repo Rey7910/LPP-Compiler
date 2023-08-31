@@ -42,15 +42,49 @@ class Lexer():
     'y':r'\by\b(?![\w_])',
     }
     
+    
+    symbols_regex_dict = {
+        'assign':r'<-',
+        'period':r'\.',
+        'comma':r',',
+        'colon':r':',
+        'closing_bra':r'\]',
+        'opening_bra':r'\[',
+        'closing_par':r'\)',
+        'opening_par':r'\(',
+        'plus':r'\+',
+        'minus':r'\-',
+        'times':r'\*',
+        'div':r'/',
+        'power':r'\^',
+        'equal':r'=',
+        'neq':r'<>',
+        'leq':r'<=',
+        'geq':r'>=',
+        'greater':r'>',
+        'less':r'<',
+        
+    }
+    
     def match_symbol(self,code,line,end_index,position):
         
-        char_match = r'\'(.*?)\''
+        found=False
         
-        if re.match(char_match, code, re.IGNORECASE) != None:
-            self.report_token('tkn_char',re.match(char_match, code).group(),line,position+1,False)
-            end_index = re.match(char_match, code).end()
-            position+=end_index
-        else:
+        for key in self.symbols_regex_dict:
+            
+            #print("the code: ",code ,"; and the regex: ",self.symbols_regex_dict[key])
+            #print(key,": ",re.match(self.symbols_regex_dict[key],code))
+            
+           
+            if re.match(self.symbols_regex_dict[key], code) != None:
+
+                self.report_token("tkn_"+key,key,line,position+1,True)
+                end_index = re.match(self.symbols_regex_dict[key], code).end()
+                position+=end_index
+                found=True
+                break
+        
+        if(found==False):
             self.report_error(line,position+1)
         
         return end_index
