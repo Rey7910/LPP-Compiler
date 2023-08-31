@@ -1,5 +1,5 @@
 '''
-Lexer - Lenguaje de Programación LPP
+Analizador léxico - Lenguaje de Programación LPP
 Reinaldo Toledo Leguizamón
 Monitoría de Lenguajes de programación
 2023-2
