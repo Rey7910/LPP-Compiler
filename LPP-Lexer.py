@@ -14,6 +14,7 @@ class Lexer():
     'de':r'\bde\b(?![\w_])',
     'div':r'\bdiv\b(?![\w_])',
     'entero':r'\bentero\b(?![\w_])',
+    'entonces':r'\bentonces\b(?![\w_])',
     'escriba':r'\bescriba\b(?![\w_])',
     'falso':r'\bfalso\b(?![\w_])',
     'fin':r'\bfin\b(?![\w_])',
