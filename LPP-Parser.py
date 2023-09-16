@@ -77,8 +77,57 @@ class Parser():
             ['empty']
             ],
         'PARp_1':[
-                ['var','V_1','PARp_2']
+                ['var','V_1','PARp_2'],
+                ['V_1','PARp_2']
+            ],
+        'PARp_2':[
+                ['tkn_comma','PARp_1'],
+                ['empty']
+            ],
+        
+        'M': [
+            ['inicio','S','fin']
+            ],
+        
+        'S':[
+             ['L','S'],
+             ['CO','S'],
+             ['A','S'],
+             ['E','S'],
+             ['CA','S'],
+             ['CAL','S'],
+             ['empty'],
+            ],
+        
+        'L':[
+                ['mientras','EXP_C','haga','S','fin','mientras'],
+                ['repita','S','hasta','EXP_C'],
+                ['para','A','hasta','EXP','haga','S','fin','para'],
+            ],
+        'CO':[
+                ['si','EXP_C','entonces','S','CO_1','fin','si']
+            ],
+        'CO_1':[
+                ['sino','si','EXP_C','entonces','S','CO_1','fin si'],
+                ['sino','S'],
+                ['empty']
+            ],
+            
+        'A':[
+                ['id','AC','tkn_assign','EXP'],
+        
+            ],
+        'AC':[
+                ['tkn_period','id','AC'],
+                ['tkn_opening_bra','EXP','AC_1','tkn_closing_bra']
+                ['empty']
+            ],
+        
+        'AC_1':[
+                ['tkn_comma','EXP','AC_1'],
+                ['empty']
             ]
+        
     }
     
     def analize(self,token):
