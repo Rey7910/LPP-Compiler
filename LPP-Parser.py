@@ -179,7 +179,7 @@ class Parser():
             ],
         
         'EXP':[
-                ['T','OP_E'],
+                ['Te','OP_E'],
                 ['tkn_opening_par','EXP','tkn_closing_par'],
             ],
         
@@ -190,12 +190,12 @@ class Parser():
                 ['empty']
             ],
         
-        'T':[
-                ['tkn_minus','T'],
-                ['id','T_id'],
+        'Te':[
+                ['tkn_minus','Te'],
+                ['id','Te_id'],
             ],
         
-        'T_id':[
+        'Te_id':[
                 
                 ['ARGS'],
                 ['AC']
@@ -256,10 +256,10 @@ class Parser():
                 
                 rule = self.lookForMatchRule(current_no_terminal,token)
                     
-                #print("Updated prediction set: ",self.prediction_set)
+                print("Updated prediction set: ",self.prediction_set)
                 
                 if(rule=='error'):
-                    #print("Error sintáctico")
+                    print("Error sintáctico")
                     self.error=True
                     break
                 else:
@@ -268,7 +268,7 @@ class Parser():
                         if i!="empty":
                             self.stack.append(i)
                     
-                   #print("Updated stack: ",self.stack)
+                    print("Updated stack: ",self.stack)
                 
                 
                     
@@ -295,7 +295,7 @@ class Parser():
             if(i[0][0].isupper()):
                 possible = self.lookForMatchRule(i[0],token)
                 
-                #print("Possible match across another rule: ",possible)
+                #print("Possible match across another rule: "+i[0],possible)
                 
                 if(possible!='error'):
                     match = i
@@ -639,7 +639,7 @@ try:
         
 except EOFError:
     EOF=True
-    
+    print("Parser stack after EOF found: ",Lpp_lexer.parser.stack)
     if(EOF==True and Lpp_lexer.block_comment==True):
         Lpp_lexer.report_error(Lpp_lexer.block_comment_line,Lpp_lexer.block_comment_position+1)
 
