@@ -119,14 +119,119 @@ class Parser():
             ],
         'AC':[
                 ['tkn_period','id','AC'],
-                ['tkn_opening_bra','EXP','AC_1','tkn_closing_bra']
+                ['tkn_opening_bra','EXP','AC_1','tkn_closing_bra'],
                 ['empty']
             ],
         
         'AC_1':[
                 ['tkn_comma','EXP','AC_1'],
                 ['empty']
-            ]
+            ],
+        'E':[
+                ['escriba','EXP','E_exp'],
+                ['lea','id','AC']
+            ],
+        'E_exp':[
+                ['tkn_comma','EXP','E_exp'],
+                ['empty']
+            ],
+        
+        'CAL':[
+                ['llamar','CAL_ex'],
+            ],
+        
+        'CAL_ex':[
+                ['nueva_linea'],
+                ['id','ARGS']
+            ],
+            
+        'ARGS':[
+                ['tkn_opening_par','EXP','AC_1','tkn_closing_par'],
+            ],
+        
+        'CA':[
+                ['caso','id','AC','CA_SEC','tkn_colon','S','CA_OP','fin','caso']
+            ],
+        
+        'CA_OP':[
+                ['CA_SEC','tkn_colon','S','CA_OP'],
+                ['sino','tkn_colon','S'],
+                ['empty']
+            ],
+            
+        'CA_SEC':[
+                
+                ['VAL','CA_SEC_1']
+            ],
+        'CA_SEC_1':[
+                ['tkn_comma','VAL','CA_SEC_1'],
+                ['empty']
+            ],
+        'VAL':[
+                
+                ['tkn_integer'],
+                ['tkn_real'],
+                ['tkn_char'],
+                ['tkn_string'],
+                ['verdadero'],
+                ['falso']
+                
+            ],
+        
+        'EXP':[
+                ['T','OP_E'],
+                ['tkn_opening_par','EXP','tkn_closing_par'],
+            ],
+        
+        
+        
+        'OP_E':[
+                ['OP_A','EXP'],
+                ['empty']
+            ],
+        
+        'T':[
+                ['tkn_minus','T'],
+                ['id','T_id'],
+            ],
+        
+        'T_id':[
+                
+                ['ARGS'],
+                ['AC']
+            ],
+        
+        'OP_A':[
+                ['tkn_minus'],
+                ['tkn_plus'],
+                ['tkn_times'],
+                ['tkn_power'],
+                ['tkn_div'],
+                ['div'],
+                ['mod']
+            ],
+        'EXP_C':[
+                ['tkn_opening_par','EXP_C','tkn_closing_par','EXP_C_1'],
+                ['EXP','OP_R','EXP'],
+            ],
+        
+        'EXP_C_1':[
+                ['OP_L','tkn_opening_par','EXP','OP_R','EXP','tkn_closing_par','EXP_C_1'],
+                ['empty']
+            ],
+        'OP_R':[
+            ['tkn_equal'],
+            ['tkn_less'],
+            ['tkn_greater'],
+            ['tkn_leq'],
+            ['tkn_geq'],
+            ['tkn_neq']
+        ],
+        'OP_L':[
+          ['o'],
+          ['y']
+        ],
+        
         
     }
     
