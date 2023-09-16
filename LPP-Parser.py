@@ -38,7 +38,7 @@ class Parser():
             ['empty']
             ],
         'V_1':[
-            ['arreglo','tkn_opening_bra','PA','tkn_closing_bra','de','T'],
+            ['arreglo','tkn_opening_bra','PA','tkn_closing_bra','de','T','id'],
             ['T','id']
             ],
         'PA':[
@@ -59,11 +59,13 @@ class Parser():
     }
     
     def analize(self,token):
+        print("*************************** Next Token *******************")
         self.showTokenInfo(token)
-        print("-------------------------")
+        print("Prediction set before the match algorithm",self.prediction_set)
         match=False
-        print(self.stack)
+        print("Stack before the match algorithm: ",self.stack)
         
+        print("******************** Starting match process *******************")
         
         while(match==False):
           
@@ -73,11 +75,11 @@ class Parser():
                 
                 current_no_terminal = current_element
             
-                print(self.grammar[current_no_terminal])
+                #print("Current no terminal rules:",self.grammar[current_no_terminal])
                 
                 rule = self.lookForMatchRule(current_no_terminal,token)
                     
-                print("Updated prediction set: ",self.prediction_set)
+                #print("Updated prediction set: ",self.prediction_set)
                 
                 if(rule=='error'):
                     #print("Error sintáctico")
@@ -89,7 +91,7 @@ class Parser():
                         if i!="empty":
                             self.stack.append(i)
                     
-                    print("Updated stack: ",self.stack)
+                   #print("Updated stack: ",self.stack)
                 
                 
                     
@@ -99,9 +101,10 @@ class Parser():
                 
                 if(current_element==token.token):
                     match=True
+                    print("*************************** Token matched successfully *******************")
+                    self.prediction_set.clear()
                     break
                 else:
-                    #print("Error sintáctico")
                     self.error = True
                     break
     
@@ -115,6 +118,8 @@ class Parser():
             if(i[0][0].isupper()):
                 possible = self.lookForMatchRule(i[0],token)
                 
+                #print("Possible match across another rule: ",possible)
+                
                 if(possible!='error'):
                     match = i
                     return match
@@ -125,7 +130,7 @@ class Parser():
                 return i
                 break
             
-            elif(i[0]==token):
+            elif(i[0]==token.token):
                 return i
                 break
                 
@@ -452,6 +457,7 @@ try:
         
         if(Lpp_lexer.parser.error==True):
             print("Error sintáctico")
+            print("Se esperaba: ",Lpp_lexer.parser.prediction_set)
         line+=1
         
 except EOFError:
