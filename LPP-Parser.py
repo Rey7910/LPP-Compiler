@@ -57,8 +57,8 @@ class Parser():
             ['id'],
             ],
         'F_P':[
-            ['F','PR','F_P'],
-            ['PR','F','F_P'],
+            ['F','F_P'],
+            ['PR','F_P'],
             ['empty']
             ],
         'F':[
@@ -172,7 +172,7 @@ class Parser():
                 ['tkn_integer'],
                 ['tkn_real'],
                 ['tkn_char'],
-                ['tkn_string'],
+                ['tkn_str'],
                 ['verdadero'],
                 ['falso']
                 
@@ -192,6 +192,7 @@ class Parser():
         
         'Te':[
                 ['tkn_minus','Te'],
+                ['VAL'],
                 ['id','Te_id'],
             ],
         
@@ -259,7 +260,7 @@ class Parser():
                 print("Updated prediction set: ",self.prediction_set)
                 
                 if(rule=='error'):
-                    print("Error sintáctico")
+                    #print("Error sintáctico")
                     self.error=True
                     break
                 else:
@@ -635,6 +636,7 @@ try:
         if(Lpp_lexer.parser.error==True):
             print("Error sintáctico")
             print("Se esperaba: ",Lpp_lexer.parser.prediction_set)
+            break
         line+=1
         
 except EOFError:
