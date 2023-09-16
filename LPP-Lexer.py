@@ -149,7 +149,7 @@ class Lexer():
         
         # Match the id
         
-        id_match = r'[a-zA-Z_][\w_]*'
+        id_match = r'[a-zA-Z_][0-9a-zA-Z_]*'
         
         if re.match(id_match, code, re.IGNORECASE) != None:
             self.report_token('id',re.match(id_match, code, re.IGNORECASE).group().lower(),line,position+1,False)
