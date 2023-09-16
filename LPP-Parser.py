@@ -56,6 +56,29 @@ class Parser():
             ['caracter'],
             ['id'],
             ],
+        'F_P':[
+            ['F','PR','F_P'],
+            ['PR','F','F_P'],
+            ['empty']
+            ],
+        'F':[
+            ['funcion','id','PAR','tkn_colon','T','V','inicio','S','retorne','EXP','fin']
+            ],
+        'PAR':[
+            ['tkn_opening_par','V_1','PAR_1','tkn_closing_par'],
+            ['empty']
+            ],
+        'PR':[
+            ['procedimiento','id','PARp','V','inicio','S','fin']
+            ],
+        
+        'PARp':[
+            ['tkn_opening_par','PARp_1','tkn_closing_par'],
+            ['empty']
+            ],
+        'PARp_1':[
+                ['var','V_1','PARp_2']
+            ]
     }
     
     def analize(self,token):
@@ -291,7 +314,7 @@ class Lexer():
         
         # Match the id
         
-        id_match = r'[a-zA-Z_][\w_]*'
+        id_match = r'[a-zA-Z_][0-9a-zA-Z_]*'
         
         if re.match(id_match, code, re.IGNORECASE) != None:
             self.report_token('id',re.match(id_match, code, re.IGNORECASE).group().lower(),line,position+1,False)
