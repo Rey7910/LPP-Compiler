@@ -494,6 +494,11 @@ class Parser():
         print("<"+str(token.token)+","+str(token.lexem)+","+str(token.line)+","+str(token.position)+">")
         
         
+    
+    
+    
+    
+    
     def reportError(self,token):
         
         if token.lexem=='assign':
@@ -973,3 +978,4 @@ except EOFError:
         EOF_tkn= Token('EOF','EOF',100,100)
         
         Lpp_lexer.parser.analize(EOF_tkn)
+
