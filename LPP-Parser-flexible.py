@@ -79,6 +79,12 @@ class Parser():
             ['tkn_opening_par','V_1','PAR_1','tkn_closing_par'],
             ['empty']
             ],
+            
+        'PAR_1':[
+                ['tkn_comma','V_1','PAR_1'],
+                ['empty']
+            ],
+        
         'PR':[
             ['procedimiento','id','PARp','V','inicio','S','fin']
             ],
@@ -872,3 +878,4 @@ except EOFError:
         
     else:
         print("El analisis sintactico ha finalizado exitosamente.")
+
