@@ -213,7 +213,7 @@ class Parser():
             ],
             
         'OP_EA':[
-                ['tkn_opening_par','Te','OP_AOP','tkn_closing_par'],
+                ['tkn_opening_par','Te','OP_AOP','tkn_closing_par','OP_AOP'],
                 ['Te','OP_AOP'],
             ],
         
