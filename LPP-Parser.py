@@ -266,8 +266,9 @@ class Parser():
             while(match==False and self.LL1==True):
                 
                 if(len(self.stack) < 1):
-                    error=True
+                    self.error=True
                     self.reportError(i)
+                    
                     break
           
                 current_element = self.stack.pop()
@@ -392,7 +393,7 @@ class Parser():
         while(match==False and self.LL1==True and self.finishCatchUp==False):
           
             if(len(self.stack) < 1):
-                error=True
+                self.error=True
                 self.reportError(token)
                 break
             
@@ -557,6 +558,9 @@ class Parser():
             
         elif token.lexem == 'geq':
             token.lexem ='>='
+            
+        elif token.lexem == "EOF":
+            token.lexem="fin de archivo"
         
         
         print("<{}:{}> Error sintactico: se encontro \"{}\"; se esperaba:".format(str(token.line),str(token.position),token.lexem),end="")
@@ -975,7 +979,10 @@ except EOFError:
     if(EOF==True and len(Lpp_lexer.parser.stack)>0):
         #print("Error sintáctico en final de archivo")
         
-        EOF_tkn= Token('EOF','EOF',100,100)
+        EOF_tkn= Token('EOF','EOF',line,1)
         
         Lpp_lexer.parser.analize(EOF_tkn)
+        
+    else:
+        print("El analisis sintactico ha finalizado exitosamente.")
 
