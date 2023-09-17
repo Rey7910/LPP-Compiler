@@ -24,10 +24,6 @@ class Parser():
     prediction_set = set([])
     stack =[]
     error=False
-
-    EXP_set = set(['tkn_integer','tkn_real','tkn_char','tkn_str','verdadero','falso',
-    'id','tkn_opening_bra','tkn_closing_bra','tkn_plus','tkn_div',
-    'tkn_times','tkn_minus','tkn_power','div','mod', "tkn_opening_par","tkn_closing_par"])
     
     grammar = {
         'P':[
@@ -876,3 +872,4 @@ except EOFError:
         
     else:
         print("El analisis sintactico ha finalizado exitosamente.")
+
