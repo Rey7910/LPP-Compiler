@@ -450,7 +450,7 @@ class Parser():
             token.lexem="final de archivo"
         
         
-        print("<{}:{}> Error sintactico: se encontro \"{}\"; se esperaba:".format(str(token.line),str(token.position),token.lexem),end="")
+        print("<{}:{}> Error sintactico: se encontro: \"{}\"; se esperaba:".format(str(token.line),str(token.position),token.lexem),end="")
         
         
         report_prediction_set = list(self.prediction_set)
@@ -872,4 +872,3 @@ except EOFError:
         
     else:
         print("El analisis sintactico ha finalizado exitosamente.")
-
