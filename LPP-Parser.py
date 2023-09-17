@@ -126,9 +126,10 @@ class Parser():
             ],
         'CO':[
                 ['si','EXP_C','entonces','S','CO_1','fin','si']
+                #['si','EXP_C','entonces','S','fin','si']
             ],
         'CO_1':[
-                ['sino','si','EXP_C','entonces','S','CO_1','fin', 'si'],
+                #['sino','si','EXP_C','entonces','S','CO_1','fin', 'si'],
                 ['sino','S'],
                 ['empty']
             ],
@@ -996,4 +997,3 @@ except EOFError:
         
     else:
         print("El analisis sintactico ha finalizado exitosamente.")
-
