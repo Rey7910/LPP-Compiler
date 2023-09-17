@@ -572,7 +572,7 @@ class Parser():
             token.lexem ='>='
             
         elif token.lexem == "EOF":
-            token.lexem="fin de archivo"
+            token.lexem="final de archivo"
         
         
         print("<{}:{}> Error sintactico: se encontro \"{}\"; se esperaba:".format(str(token.line),str(token.position),token.lexem),end="")
@@ -997,3 +997,4 @@ except EOFError:
         
     else:
         print("El analisis sintactico ha finalizado exitosamente.")
+
