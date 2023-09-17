@@ -41,6 +41,11 @@ class Parser():
             ['arreglo','tkn_opening_bra','PA','tkn_closing_bra','de','T','id','V_2'],
             ['T','id','V_2']
             ],
+            
+        'V_1_PF':[
+            ['arreglo','tkn_opening_bra','PA','tkn_closing_bra','de','T','id'],
+            ['T','id']
+            ],
         
         'V_2':[
                 ['tkn_comma','id','V_2'],
@@ -68,7 +73,7 @@ class Parser():
             ['empty']
             ],
         'F':[
-            ['funcion','id','PAR','tkn_colon','T','V','inicio','S','F_1','fin']
+            ['funcion','id','PARp','tkn_colon','T','V','inicio','S','F_1','fin']
             ],
             
         'F_1':[
@@ -94,8 +99,8 @@ class Parser():
             ['empty']
             ],
         'PARp_1':[
-                ['var','V_1','PARp_2'],
-                ['V_1','PARp_2']
+                ['var','V_1_PF','PARp_2'],
+                ['V_1_PF','PARp_2']
             ],
         'PARp_2':[
                 ['tkn_comma','PARp_1'],
@@ -878,4 +883,3 @@ except EOFError:
         
     else:
         print("El analisis sintactico ha finalizado exitosamente.")
-
