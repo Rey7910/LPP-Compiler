@@ -293,6 +293,7 @@ class Parser():
                     if(rule=='error'):
                         #print("Error sintáctico")
                         self.error=True
+                        self.reportError(token)
                         break
                     else:
                         for j in reversed(rule):
@@ -318,6 +319,7 @@ class Parser():
                         break
                     else:
                         self.error = True
+                        self.reportError(token)
                         break
         
         self.LLkTokenContainer.clear()
@@ -410,6 +412,7 @@ class Parser():
                 if(rule=='error'):
                     #print("Error sintáctico")
                     self.error=True
+                    self.reportError(token)
                     break
                 else:
                     for i in reversed(rule):
@@ -432,6 +435,7 @@ class Parser():
                     break
                 else:
                     self.error = True
+                    self.reportError(token)
                     break
                 
         
@@ -476,7 +480,23 @@ class Parser():
     
     def showTokenInfo(self,token):
         print("<"+str(token.token)+","+str(token.lexem)+","+str(token.line)+","+str(token.position)+">")
-
+        
+        
+    def reportError(self,token):
+        
+        print("<{}:{}>Error sintactico: se encontro \"{}\"; se esperaba:".format(str(token.line),str(token.position),token.token),end="")
+        
+        report_prediction_set = list(self.prediction_set)
+        
+        report_prediction_set.sort()
+        
+        for i in range(len(report_prediction_set)):
+            print(" \"{}\"".format(report_prediction_set[i]),end="")
+            
+            if(i!=len(report_prediction_set)-1):
+                print(",",end="")
+            else:
+                print(".",end="")
 
 class Lexer():
     
@@ -786,8 +806,9 @@ try:
             break
         
         if(Lpp_lexer.parser.error==True):
-            print("Error sintáctico")
-            print("Se esperaba: ",Lpp_lexer.parser.prediction_set)
+            
+            #print("Error sintáctico")
+            #print("Se esperaba: ",Lpp_lexer.parser.prediction_set)
             break
         line+=1
         
@@ -796,4 +817,6 @@ except EOFError:
     print("Parser stack after EOF found: ",Lpp_lexer.parser.stack)
     if(EOF==True and Lpp_lexer.block_comment==True):
         Lpp_lexer.report_error(Lpp_lexer.block_comment_line,Lpp_lexer.block_comment_position+1)
-
+    
+    if(EOF==True and len(Lpp_lexer.parser.stack)>0):
+        print("Error sintáctico en final de archivo")
