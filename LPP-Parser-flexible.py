@@ -165,7 +165,17 @@ class Parser():
         
         'CAL_ex':[
                 ['nueva_linea'],
-                ['id','ARGS']
+                ['id','ARGS_CAL']
+            ],
+        'ARGS_CAL':[
+                ['tkn_opening_par','ARGS_EXP','tkn_closing_par'],
+                ['empty'],
+                
+            ],
+        
+        'ARGS_EXP':[
+                ['EXP','AC_1'],
+                ['empty']
             ],
             
         'ARGS':[
