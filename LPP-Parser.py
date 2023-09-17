@@ -23,7 +23,16 @@ class Parser():
     
     prediction_set = set([])
     stack =[]
+    LLkTokenContainer=[]
+    LL1=True
     error=False
+    pars_counter=0
+    exp_arith=False
+    finishCatchUp=False
+    
+    EXP_set = set(['tkn_integer','tkn_real','tkn_char','tkn_str','verdadero','falso',
+    'id','tkn_opening_bra','tkn_closing_bra','tkn_plus','tkn_div',
+    'tkn_times','tkn_minus','tkn_power','div','mod', "tkn_opening_par","tkn_closing_par"])
     
     grammar = {
         'P':[
@@ -236,28 +245,167 @@ class Parser():
         
     }
     
+    
+    
+    
+    def catchUpLL1(self):
+        
+        rule_applied=True
+        self.finishCatchUp=True
+        
+        for i in range(len(self.LLkTokenContainer)):
+            
+            #print("---------------------- Next Token --------------------------")
+            #self.showTokenInfo(self.LLkTokenContainer[i])
+            #print("Prediction set before the match algorithm",self.prediction_set)
+            match=False
+            #print("Stack before the match algorithm: ",self.stack)
+            
+            #print("---------------------- Starting match process----------------------")
+            
+            while(match==False and self.LL1==True):
+          
+                current_element = self.stack.pop()
+                
+                
+                if(current_element[0].isupper()):
+                    
+                    current_no_terminal = current_element
+                    
+                    if(rule_applied==True):
+                        
+                        if(self.exp_arith==True):
+                            rule=self.grammar['EXP_C'][1]
+                            self.exp_arith==False
+                            rule_applied=False
+                        else:
+                            rule=self.grammar['EXP_C'][0]
+                            rule_applied=False
+                    
+                    else:
+        
+                        rule = self.lookForMatchRule(current_no_terminal,self.LLkTokenContainer[i])
+                        
+                    #print("Rule that must be applied",rule)
+                        
+                    #print("Updated prediction set: ",self.prediction_set)
+                    
+                    if(rule=='error'):
+                        #print("Error sintáctico")
+                        self.error=True
+                        break
+                    else:
+                        for j in reversed(rule):
+                            
+                            if j!="empty":
+                                self.stack.append(j)
+                        
+                        #print("Updated stack: ",self.stack)
+                    
+                    
+                        
+                else:
+                    
+                    self.prediction_set.add(current_element)
+                    #print("Symbol parsed")
+                    #print(i)
+                    #print(self.LLkTokenContainer[i])
+                    
+                    if(current_element==self.LLkTokenContainer[i].token):
+                        match=True
+                        #print("*************************** Token matched successfully *******************")
+                        self.prediction_set.clear()
+                        break
+                    else:
+                        self.error = True
+                        break
+        
+        self.LLkTokenContainer.clear()
+            
+            
+            
+            
+            
+            
+    
+    
+    
     def analize(self,token):
-        print("*************************** Next Token *******************")
-        self.showTokenInfo(token)
-        print("Prediction set before the match algorithm",self.prediction_set)
+        #print("*************************** Next Token *******************")
+        #self.showTokenInfo(token)
+        #print("Prediction set before the match algorithm",self.prediction_set)
         match=False
-        print("Stack before the match algorithm: ",self.stack)
+        #print("Stack before the match algorithm: ",self.stack)
         
-        print("******************** Starting match process *******************")
+        #print("******************** Starting match process *******************")
         
-        while(match==False):
+        
+        if(self.LL1==False):
+            
+            if(token.token=="tkn_opening_par"):
+                self.pars_counter+=1
+                self.LLkTokenContainer.append(token)
+            
+            elif(token.token=="tkn_closing_par"):
+                self.pars_counter-=1
+                self.LLkTokenContainer.append(token)
+                
+                if(self.pars_counter==0):
+                    self.LL1=True
+                    #print("Pars from arithmetic rule")
+                    self.exp_arith=True
+                    self.catchUpLL1()
+                    '''
+                    for i in self.LLkTokenContainer:
+                        print(i.token,end=",")
+                    print() '''
+                    
+            
+            elif token.token in self.EXP_set:
+                self.LLkTokenContainer.append(token)
+            
+            else:
+                self.LL1=True
+                #print("Pars from conditional rule")
+                self.LLkTokenContainer.append(token)
+                #print(self.pars_counter)
+                
+                '''
+                for i in self.LLkTokenContainer:
+                    print(i.token,end=",")
+                print() '''
+                
+                self.catchUpLL1()
+                
+            
+                
+            
+        
+        
+        while(match==False and self.LL1==True and self.finishCatchUp==False):
           
             current_element = self.stack.pop()
+            
             
             if(current_element[0].isupper()):
                 
                 current_no_terminal = current_element
+                
+                if(current_no_terminal=='EXP_C' and token.token == "tkn_opening_par"):
+                    #print("Switch to LL(K)")
+                    self.stack.append(current_element)
+                    self.pars_counter+=1
+                    self.LL1=False
+                    self.LLkTokenContainer.append(token)
+                    break
             
                 #print("Current no terminal rules:",self.grammar[current_no_terminal])
                 
                 rule = self.lookForMatchRule(current_no_terminal,token)
-                    
-                print("Updated prediction set: ",self.prediction_set)
+                
+                #print("Rule that must be applied",rule)
+                
+                #print("Updated prediction set: ",self.prediction_set)
                 
                 if(rule=='error'):
                     #print("Error sintáctico")
@@ -269,7 +417,7 @@ class Parser():
                         if i!="empty":
                             self.stack.append(i)
                     
-                    print("Updated stack: ",self.stack)
+                    #print("Updated stack: ",self.stack)
                 
                 
                     
@@ -279,12 +427,16 @@ class Parser():
                 
                 if(current_element==token.token):
                     match=True
-                    print("*************************** Token matched successfully *******************")
+                    #print("*************************** Token matched successfully *******************")
                     self.prediction_set.clear()
                     break
                 else:
                     self.error = True
                     break
+                
+        
+        
+        self.finishCatchUp=False
     
     
     def lookForMatchRule(self,current_no_terminal,token):
@@ -323,7 +475,7 @@ class Parser():
         
     
     def showTokenInfo(self,token):
-        print("<"+token.token+","+token.lexem+","+str(token.line)+","+str(token.position)+">")
+        print("<"+str(token.token)+","+str(token.lexem)+","+str(token.line)+","+str(token.position)+">")
 
 
 class Lexer():
