@@ -47,9 +47,15 @@ class Parser():
             ['empty']
             ],
         'V_1':[
-            ['arreglo','tkn_opening_bra','PA','tkn_closing_bra','de','T','id'],
-            ['T','id']
+            ['arreglo','tkn_opening_bra','PA','tkn_closing_bra','de','T','id','V_2'],
+            ['T','id','V_2']
             ],
+        
+        'V_2':[
+                ['tkn_comma','id','V_2'],
+                ['empty']
+            ],
+            
         'PA':[
             ['tkn_integer','PAm'],
             ],
