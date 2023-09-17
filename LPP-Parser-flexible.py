@@ -206,14 +206,14 @@ class Parser():
         
         
         'OP_E':[
-                ['OP_A','OP_EA'],
+                ['OP_A','EXP'],
                 ['OP_L','EXP'],
                 ['OP_R','OP_EA','OP_EL'],
                 ['empty']
             ],
             
         'OP_EA':[
-                ['tkn_opening_par','Te','OP_AOP','tkn_closing_par','OP_AOP'],
+                ['tkn_opening_par','Te','OP_AOP','tkn_closing_par','OP_E'],
                 ['Te','OP_AOP'],
             ],
         
