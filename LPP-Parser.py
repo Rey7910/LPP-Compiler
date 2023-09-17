@@ -200,7 +200,7 @@ class Parser():
         
         'EXP':[
                 ['Te','OP_E'],
-                ['tkn_opening_par','EXP','tkn_closing_par'],
+                ['tkn_opening_par','EXP','tkn_closing_par','OP_E'],
             ],
         
         
