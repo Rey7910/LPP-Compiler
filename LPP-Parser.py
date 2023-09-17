@@ -264,6 +264,11 @@ class Parser():
             #print("---------------------- Starting match process----------------------")
             
             while(match==False and self.LL1==True):
+                
+                if(len(self.stack) < 1):
+                    error=True
+                    self.reportError(i)
+                    break
           
                 current_element = self.stack.pop()
                 
@@ -386,7 +391,14 @@ class Parser():
         
         while(match==False and self.LL1==True and self.finishCatchUp==False):
           
+            if(len(self.stack) < 1):
+                error=True
+                self.reportError(token)
+                break
+            
             current_element = self.stack.pop()
+            
+            
             
             
             if(current_element[0].isupper()):
@@ -484,11 +496,148 @@ class Parser():
         
     def reportError(self,token):
         
-        print("<{}:{}>Error sintactico: se encontro \"{}\"; se esperaba:".format(str(token.line),str(token.position),token.token),end="")
+        if token.lexem=='assign':
+                token.lexem='<-'
+                
+        elif token.lexem == 'period':
+            token.lexem ='.'
+        
+        elif token.lexem == 'comma':
+            token.lexem=','
+            
+        elif token.lexem == 'colon':
+            token.lexem=':'
+        
+        elif token.lexem == 'closing_bra':
+            token.lexem=']'
+        
+        elif token.lexem == 'opening_bra':
+            token.lexem='['
+            
+        elif token.lexem == 'closing_par':
+            token.lexem=')'
+            
+        elif token.lexem == 'opening_par':
+            token.lexem='('
+            
+        elif token.lexem == 'plus':
+            token.lexem='+'
+            
+        elif token.lexem == 'minus':
+            token.lexem='-'
+            
+        elif token.lexem == 'times':
+            token.lexem='*'
+            
+        elif token.lexem == 'div':
+            token.lexem='/'
+            
+        elif token.lexem == 'power':
+            token.lexem='^'
+            
+        elif token.lexem == 'equal':
+            token.lexem='='
+            
+        elif token.lexem == 'neq':
+            token.lexem='<>'
+            
+        elif token.lexem == 'less':
+            token.lexem='<'
+            
+        elif token.lexem == 'leq':
+            token.lexem='<='
+            
+        elif token.lexem == 'greater':
+            token.lexem='>'
+            
+        elif token.lexem == 'geq':
+            token.lexem ='>='
+        
+        
+        print("<{}:{}> Error sintactico: se encontro \"{}\"; se esperaba:".format(str(token.line),str(token.position),token.lexem),end="")
+        
         
         report_prediction_set = list(self.prediction_set)
         
+        
+        for i in range(len(report_prediction_set)):
+            if report_prediction_set[i]=='tkn_integer':
+                report_prediction_set[i]='valor_entero'
+                
+            elif report_prediction_set[i]=='tkn_real':
+                report_prediction_set[i]='valor_real'
+                
+            elif report_prediction_set[i]=='tkn_char':
+                report_prediction_set[i]='caracter_simple'
+                
+            elif report_prediction_set[i]=='tkn_str':
+                report_prediction_set[i]='cadena_de_caracteres'
+        
+        
         report_prediction_set.sort()
+        
+        
+        for i in range(len(report_prediction_set)):
+            
+            if report_prediction_set[i]=='tkn_assign':
+                report_prediction_set[i]='<-'
+                
+            elif report_prediction_set[i] == 'tkn_period':
+                report_prediction_set[i]='.'
+            
+            elif report_prediction_set[i] == 'tkn_comma':
+                report_prediction_set[i]=','
+                
+            elif report_prediction_set[i] == 'tkn_colon':
+                report_prediction_set[i]=':'
+            
+            elif report_prediction_set[i] == 'tkn_closing_bra':
+                report_prediction_set[i]=']'
+            
+            elif report_prediction_set[i] == 'tkn_opening_bra':
+                report_prediction_set[i]='['
+                
+            elif report_prediction_set[i] == 'tkn_closing_par':
+                report_prediction_set[i]=')'
+                
+            elif report_prediction_set[i] == 'tkn_opening_par':
+                report_prediction_set[i]='('
+                
+            elif report_prediction_set[i] == 'tkn_plus':
+                report_prediction_set[i]='+'
+                
+            elif report_prediction_set[i] == 'tkn_minus':
+                report_prediction_set[i]='-'
+                
+            elif report_prediction_set[i] == 'tkn_times':
+                report_prediction_set[i]='*'
+                
+            elif report_prediction_set[i] == 'tkn_div':
+                report_prediction_set[i]='/'
+                
+            elif report_prediction_set[i] == 'tkn_power':
+                report_prediction_set[i]='^'
+                
+            elif report_prediction_set[i] == 'tkn_equal':
+                report_prediction_set[i]='='
+                
+            elif report_prediction_set[i] == 'tkn_neq':
+                report_prediction_set[i]='<>'
+                
+            elif report_prediction_set[i] == 'tkn_less':
+                report_prediction_set[i]='<'
+                
+            elif report_prediction_set[i] == 'tkn_leq':
+                report_prediction_set[i]='<='
+                
+            elif report_prediction_set[i] == 'tkn_greater':
+                report_prediction_set[i]='>'
+                
+            elif report_prediction_set[i] == 'tkn_geq':
+                report_prediction_set[i]='>='
+        
+        if(len(report_prediction_set)==0):
+            report_prediction_set.append('final de archivo')
         
         for i in range(len(report_prediction_set)):
             print(" \"{}\"".format(report_prediction_set[i]),end="")
@@ -814,9 +963,13 @@ try:
         
 except EOFError:
     EOF=True
-    print("Parser stack after EOF found: ",Lpp_lexer.parser.stack)
+    #print("Parser stack after EOF found: ",Lpp_lexer.parser.stack)
     if(EOF==True and Lpp_lexer.block_comment==True):
         Lpp_lexer.report_error(Lpp_lexer.block_comment_line,Lpp_lexer.block_comment_position+1)
     
     if(EOF==True and len(Lpp_lexer.parser.stack)>0):
-        print("Error sintáctico en final de archivo")
+        #print("Error sintáctico en final de archivo")
+        
+        EOF_tkn= Token('EOF','EOF',100,100)
+        
+        Lpp_lexer.parser.analize(EOF_tkn)
