@@ -77,7 +77,12 @@ class Parser():
             ['empty']
             ],
         'F':[
-            ['funcion','id','PAR','tkn_colon','T','V','inicio','S','retorne','EXP','fin']
+            ['funcion','id','PAR','tkn_colon','T','V','inicio','S','F_1','fin']
+            ],
+            
+        'F_1':[
+                ['retorne', 'EXP'],
+                ['empty']
             ],
         'PAR':[
             ['tkn_opening_par','V_1','PAR_1','tkn_closing_par'],
