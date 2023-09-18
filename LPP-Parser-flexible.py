@@ -152,7 +152,7 @@ class Parser():
             ],
         'E':[
                 ['escriba','EXP','E_exp'],
-                ['lea','id','AC']
+                ['lea','id','AC','V_2']
             ],
         'E_exp':[
                 ['tkn_comma','EXP','E_exp'],
@@ -225,7 +225,8 @@ class Parser():
             ],
             
         'OP_EA':[
-                ['tkn_opening_par','Te','OP_AOP','tkn_closing_par','OP_E'],
+                ['tkn_opening_par','Te','OP_AOP','tkn_closing_par','OP_AOP'], # error partialy fixed
+                #['tkn_opening_par','Te','OP_AOP','tkn_closing_par'],
                 ['Te','OP_AOP'],
             ],
         
