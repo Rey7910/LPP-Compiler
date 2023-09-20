@@ -23,16 +23,7 @@ class Parser():
     
     prediction_set = set([])
     stack =[]
-    LLkTokenContainer=[]
-    LL1=True
     error=False
-    pars_counter=0
-    exp_arith=False
-    finishCatchUp=False
-    
-    EXP_set = set(['tkn_integer','tkn_real','tkn_char','tkn_str','verdadero','falso',
-    'id','tkn_opening_bra','tkn_closing_bra','tkn_plus','tkn_div',
-    'tkn_times','tkn_minus','tkn_power','div','mod', "tkn_opening_par","tkn_closing_par"])
     
     grammar = {
         'P':[
@@ -49,6 +40,11 @@ class Parser():
         'V_1':[
             ['arreglo','tkn_opening_bra','PA','tkn_closing_bra','de','T','id','V_2'],
             ['T','id','V_2']
+            ],
+            
+        'V_1_PF':[
+            ['arreglo','tkn_opening_bra','PA','tkn_closing_bra','de','T','id'],
+            ['T','id']
             ],
         
         'V_2':[
@@ -77,7 +73,7 @@ class Parser():
             ['empty']
             ],
         'F':[
-            ['funcion','id','PAR','tkn_colon','T','V','inicio','S','F_1','fin']
+            ['funcion','id','PARp','tkn_colon','T','V','inicio','S','F_1','fin']
             ],
             
         'F_1':[
@@ -88,6 +84,12 @@ class Parser():
             ['tkn_opening_par','V_1','PAR_1','tkn_closing_par'],
             ['empty']
             ],
+            
+        'PAR_1':[
+                ['tkn_comma','V_1','PAR_1'],
+                ['empty']
+            ],
+        
         'PR':[
             ['procedimiento','id','PARp','V','inicio','S','fin']
             ],
@@ -97,8 +99,8 @@ class Parser():
             ['empty']
             ],
         'PARp_1':[
-                ['var','V_1','PARp_2'],
-                ['V_1','PARp_2']
+                ['var','V_1_PF','PARp_2'],
+                ['V_1_PF','PARp_2']
             ],
         'PARp_2':[
                 ['tkn_comma','PARp_1'],
@@ -120,12 +122,12 @@ class Parser():
             ],
         
         'L':[
-                ['mientras','EXP_C','haga','S','fin','mientras'],
-                ['repita','S','hasta','EXP_C'],
+                ['mientras','EXP','haga','S','fin','mientras'],
+                ['repita','S','hasta','EXP'],
                 ['para','A','hasta','EXP','haga','S','fin','para'],
             ],
         'CO':[
-                ['si','EXP_C','entonces','S','CO_1','fin','si']
+                ['si','EXP','entonces','S','CO_1','fin','si']
                 #['si','EXP_C','entonces','S','fin','si']
             ],
         'CO_1':[
@@ -140,7 +142,12 @@ class Parser():
             ],
         'AC':[
                 ['tkn_period','id','AC'],
-                ['tkn_opening_bra','EXP','AC_1','tkn_closing_bra'],
+                ['tkn_opening_bra','EXP','AC_1','tkn_closing_bra','AC_2'],
+                ['empty']
+            ],
+            
+        'AC_2':[
+                ['tkn_period','id','AC_2','AC'],
                 ['empty']
             ],
         
@@ -150,7 +157,7 @@ class Parser():
             ],
         'E':[
                 ['escriba','EXP','E_exp'],
-                ['lea','id','AC']
+                ['lea','id','AC','V_2']
             ],
         'E_exp':[
                 ['tkn_comma','EXP','E_exp'],
@@ -163,7 +170,17 @@ class Parser():
         
         'CAL_ex':[
                 ['nueva_linea'],
-                ['id','ARGS']
+                ['id','ARGS_CAL']
+            ],
+        'ARGS_CAL':[
+                ['tkn_opening_par','ARGS_EXP','tkn_closing_par'],
+                ['empty'],
+                
+            ],
+        
+        'ARGS_EXP':[
+                ['EXP','AC_1'],
+                ['empty']
             ],
             
         'ARGS':[
@@ -196,7 +213,6 @@ class Parser():
                 ['tkn_str'],
                 ['verdadero'],
                 ['falso']
-                
             ],
         
         'EXP':[
@@ -208,6 +224,24 @@ class Parser():
         
         'OP_E':[
                 ['OP_A','EXP'],
+                ['OP_L','EXP'],
+                ['OP_R','OP_EA','OP_EL'],
+                ['empty']
+            ],
+            
+        'OP_EA':[
+                ['tkn_opening_par','Te','OP_AOP','tkn_closing_par','OP_AOP'], # error partialy fixed
+                #['tkn_opening_par','Te','OP_AOP','tkn_closing_par'],
+                ['Te','OP_AOP'],
+            ],
+        
+        'OP_AOP':[
+                ['OP_A','OP_EA'],
+                ['empty']
+            ],
+            
+        'OP_EL':[
+                ['OP_L','EXP'],
                 ['empty']
             ],
         
@@ -230,7 +264,7 @@ class Parser():
                 ['tkn_power'],
                 ['tkn_div'],
                 ['div'],
-                ['mod']
+                ['mod'],
             ],
         'EXP_C':[
                 ['tkn_opening_par','EXP_C','tkn_closing_par','EXP_C_1'],
@@ -256,91 +290,7 @@ class Parser():
         
         
     }
-    
-    
-    
-    
-    def catchUpLL1(self):
-        
-        rule_applied=True
-        self.finishCatchUp=True
-        
-        for i in range(len(self.LLkTokenContainer)):
-            
-            #print("---------------------- Next Token --------------------------")
-            #self.showTokenInfo(self.LLkTokenContainer[i])
-            #print("Prediction set before the match algorithm",self.prediction_set)
-            match=False
-            #print("Stack before the match algorithm: ",self.stack)
-            
-            #print("---------------------- Starting match process----------------------")
-            
-            while(match==False and self.LL1==True):
-                
-                if(len(self.stack) < 1):
-                    self.error=True
-                    self.reportError(i)
-                    
-                    break
-          
-                current_element = self.stack.pop()
-                
-                
-                if(current_element[0].isupper()):
-                    
-                    current_no_terminal = current_element
-                    
-                    if(rule_applied==True):
-                        
-                        if(self.exp_arith==True):
-                            rule=self.grammar['EXP_C'][1]
-                            self.exp_arith==False
-                            rule_applied=False
-                        else:
-                            rule=self.grammar['EXP_C'][0]
-                            rule_applied=False
-                    
-                    else:
-        
-                        rule = self.lookForMatchRule(current_no_terminal,self.LLkTokenContainer[i])
-                        
-                    #print("Rule that must be applied",rule)
-                        
-                    #print("Updated prediction set: ",self.prediction_set)
-                    
-                    if(rule=='error'):
-                        #print("Error sintáctico")
-                        self.error=True
-                        self.reportError(token)
-                        break
-                    else:
-                        for j in reversed(rule):
-                            
-                            if j!="empty":
-                                self.stack.append(j)
-                        
-                        #print("Updated stack: ",self.stack)
-                    
-                    
-                        
-                else:
-                    
-                    self.prediction_set.add(current_element)
-                    #print("Symbol parsed")
-                    #print(i)
-                    #print(self.LLkTokenContainer[i])
-                    
-                    if(current_element==self.LLkTokenContainer[i].token):
-                        match=True
-                        #print("*************************** Token matched successfully *******************")
-                        self.prediction_set.clear()
-                        break
-                    else:
-                        self.error = True
-                        self.reportError(token)
-                        break
-        
-        self.LLkTokenContainer.clear()
+
             
             
             
@@ -358,51 +308,9 @@ class Parser():
         #print("Stack before the match algorithm: ",self.stack)
         
         #print("******************** Starting match process *******************")
+    
         
-        
-        if(self.LL1==False):
-            
-            if(token.token=="tkn_opening_par"):
-                self.pars_counter+=1
-                self.LLkTokenContainer.append(token)
-            
-            elif(token.token=="tkn_closing_par"):
-                self.pars_counter-=1
-                self.LLkTokenContainer.append(token)
-                
-                if(self.pars_counter==0):
-                    self.LL1=True
-                    #print("Pars from arithmetic rule")
-                    self.exp_arith=True
-                    self.catchUpLL1()
-                    '''
-                    for i in self.LLkTokenContainer:
-                        print(i.token,end=",")
-                    print() '''
-                    
-            
-            elif token.token in self.EXP_set:
-                self.LLkTokenContainer.append(token)
-            
-            else:
-                self.LL1=True
-                #print("Pars from conditional rule")
-                self.LLkTokenContainer.append(token)
-                #print(self.pars_counter)
-                
-                '''
-                for i in self.LLkTokenContainer:
-                    print(i.token,end=",")
-                print() '''
-                
-                self.catchUpLL1()
-                
-            
-                
-            
-        
-        
-        while(match==False and self.LL1==True and self.finishCatchUp==False):
+        while(match==False):
           
             if(len(self.stack) < 1):
                 self.error=True
@@ -418,13 +326,7 @@ class Parser():
                 
                 current_no_terminal = current_element
                 
-                if(current_no_terminal=='EXP_C' and token.token == "tkn_opening_par"):
-                    #print("Switch to LL(K)")
-                    self.stack.append(current_element)
-                    self.pars_counter+=1
-                    self.LL1=False
-                    self.LLkTokenContainer.append(token)
-                    break
+            
             
                 #print("Current no terminal rules:",self.grammar[current_no_terminal])
                 
@@ -575,7 +477,7 @@ class Parser():
             token.lexem="final de archivo"
         
         
-        print("<{}:{}> Error sintactico: se encontro \"{}\"; se esperaba:".format(str(token.line),str(token.position),token.lexem),end="")
+        print("<{}:{}> Error sintactico: se encontro: \"{}\"; se esperaba:".format(str(token.line),str(token.position),token.lexem),end="")
         
         
         report_prediction_set = list(self.prediction_set)
@@ -997,4 +899,3 @@ except EOFError:
         
     else:
         print("El analisis sintactico ha finalizado exitosamente.")
-
