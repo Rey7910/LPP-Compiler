@@ -142,7 +142,7 @@ class Parser():
             ],
         'AC':[
                 ['tkn_period','id','AC'],
-                ['tkn_opening_bra','EXP','AC_1','tkn_closing_bra','AC_2'],
+                ['tkn_opening_bra','EXP','AC_1','tkn_closing_bra','AC_2','AC'],
                 ['empty']
             ],
             
